@@ -65,7 +65,45 @@ to determine which approach is appropriate for the required actions.
 \section{Introduction}
 % blah blah FAIR
 % timing offset irrelevant
+In the FAIR control system,
+a data master issues high-level commands to control accelerator devices.
+The front-end controllers in the system react to relevant commands,
+issuing appropriate actions to their hardware components.
+Depending on the action to be taken,
+there are different timing requirements to be met.
 
+Unlike the control system currently deployed at GSI~\cite{old-gsi},
+commands issued by the data master carry an absolute execution timestamp.
+The front-end controllers must receive commands early enough 
+that they can schedule their actions 
+to achieve the desired result at the correct time.
+Unfortunately, executing actions takes a variable amount of time.
+If the action takes 90-110$\mu$s to execute, 
+then this places two constraints on the system.
+First, the data master must issue commands at least 110$\mu$s ahead of time.
+Secondly, the system must be able to tolerate that the action could be as
+much as 10$\mu$s too early or too late.
+
+Issuing commands too far in advance reduces the responsiveness of the system.
+Once the data master has issued a command, it cannot be aborted.
+If the situation changes,
+perhaps due to interlock or contention from another beam user,
+the system cannot react faster than the slowest action already executing.
+This neglects, of course, other sources of latency in the system,
+such as network propagation delay, which only exacerbate the problem.
+It is thus generally desirable to have fast action execution.
+
+Non-deterministic execution time is a potentially much more serious problem.
+For example, if a kicker action executes a few nanoseconds too late,
+the beam might be lost.
+However, not all actions require the same precision,
+and it may make sense to trade accuracy for flexibility in some situations.
+
+Fortunately, the  most common equipment controller in FAIR, 
+the Scalable Control Unit (SCU),
+has several possible methods for executing actions.
+This paper outlines the timing requirements of various accelerator
+components in FAIR and explorers the alternatives which could meet them.
 
 \section{Use Cases}
 % ask someone who knows timing requirements
@@ -75,22 +113,74 @@ to determine which approach is appropriate for the required actions.
 
 
 \section{Scalable Control Unit (SCU)}
+% white rabbit
 % figure: block diagram
 % what it does
 % what it contains
 % how it works
 
 
-\section{Generation Alternatives}
+\section{Execution Alternatives}
 % blah blah -- different options, different trade-offs
-% FPGA
-% LM32: no OS
-% Atom: kernel
-% Atom: userspace
-% Atom: FESA
+When the SCU has an action to perform at a particular time, 
+it has many alternative execution paths.
+Each option carries a trade-off between timing fidelity and 
+the expressiveness of the program which performs the action.
 
+% FPGA
+\textbf{FPGA} 
+The SCU's FPGA can be programmed to generate the required output
+on a phase-aligned 8ns clock edge. 
+When augmented by a fine delay card~\cite{cern-fine-delay},
+this can be further improved to a general 1ns accuracy.
+The only source of non-determinism is the jitter of the FPGA's PLL (ps) 
+and the inherent inaccuracy of White Rabbit (ns).
+Thus, both the delay and variability are in the sub-nanosecond range 
+for this approach.
+Unfortunately, this execution path requires custom gateware and/or
+a simple output action.
+
+% LM32: no OS
+\textbf{LM32} 
+Alternatively, the FPGA can issue an interrupt to an embedded soft-CPU (LM32).
+This on-chip CPU (with no operating system), 
+can then run software to generate the appropriate action.
+The delay stems from the time to switch to interrupt context,
+run the software routine,
+and output the action.
+While broadly deterministic,
+cache behaviour and on-chip bus accesses contribute to runtime variability.
+
+% Atom: kernel
+\textbf{Atom-Kernel}
+Venturing futher afield,
+the FPGA can issue an interrupt over PCIe to the Atom processor.
+The interrupt handler in the kernel driver then takes immediate action.
+This delays are the same as for the LM32, 
+except that the interrupt is delivered off-chip via the PCIe bus.
+Furthermore, 
+the Linux kernel may have interrupts masked in some critical sections,
+increasing the runtime variability.
+
+% Atom: userspace
+\textbf{Atom-Userspace}
+Rather than running the execution software in kernel-space,
+the SCU could also deliver the interrupt to user-space.
+This adds additional context switch overhead, 
+but provides for a more comfortable programming environment.
+
+% Atom: FESA
+\textbf{FESA}
+Finally, the userspace program which executes the action could use the FESA
+architecture~\cite{fesa}.
+Under this more general framework,
+the interrupt is translated to an action using multiple threads.
+This again increases the number of context switches and adds inter-process
+synchronization delay.
+However, it arguably provides the most flexible action execution framework.
 
 \section{Analysis}
+% how measured
 % graph 1: PDF, free y-scale, 0-100us
 % table 2: average, stddev, worst-case spread
 
