@@ -20,8 +20,8 @@
 \setlength{\titleblockheight}{27mm}
 
 \begin{document}
-%\title{Facility-Wide Synchronization of Standard FAIR Equipment Controllers}
-\title{Timing Characteristics of the FAIR Equipment Controller (SCU)}
+\title{Facility-Wide Synchronization of Standard FAIR Equipment Controllers}
+%\title{Timing Characteristics of the FAIR Equipment Controller (SCU)}
 
 \author{
 S. Rauch,
@@ -72,6 +72,9 @@ to determine which approach is appropriate for the required actions.
 % kickers
 % ramps
 % bunch-to-bunch
+The SCU will be mainly used for power supplies for ramped magnets, for controlling
+RF devices and for controlling injection kickers.
+For controlling the power supplies another device called Adaptive Control Unit (ACU) \cite{acuref} is connected to the SCU. The device controlled in the RF use case is called FPGA Interface Board (FIB) \cite{fibref} . The kicker modules will be controlled by the old MIL-STD-1553 based fieldbus system.
 
 
 \section{Scalable Control Unit (SCU)}
@@ -114,11 +117,15 @@ to determine which approach is appropriate for the required actions.
 C. Petit-Jean-Genaz and J. Poole, ``JACoW, A service to the Accelerator Community,''
 EPAC'04, Lucerne, July 2004, THZCH03,  p.~249, \texttt{http://www.JACoW.org}
 
-\bibitem{jacow-help} A. Name and D. Person, Phys. Rev. Lett. 25 (1997) 56.
+\bibitem{acuref}
+H. Ramakers  et al., ``Adaptive Control Unit for Digital Control of Power Converters for Magnets in GSI and FAIR Accelerators,'' GSI Scientific Report 2008, p. 117,
+\texttt{http://www-alt.gsi.de/informationen/wti/library/scientificreport2008/PAPERS/GSI-ACCELERATORS-14.pdf}
 
-\bibitem{exampl-ref}
-A.N. Other, ``A Very Interesting Paper,'' EPAC'96, Sitges, June 1996, MOPCH31, p. 7984 (1996),
-\texttt{http://www.JACoW.org}  \{no period after URL\}
+\bibitem{fibref}
+M. Kumm  et al., ``Realtime Communication Based on Optical Fibers for the Control of Digital RF Components,'' GSI Scientific Report 2007, p. 100,
+\texttt{http://www-alt.gsi.de/informationen/wti/library/scientificreport2007/PAPERS/GSI-ACCELERATORS-14.pdf}
+
+
 
 \bibitem{exampl-ref2}
 F.E.~Black et al., {\it This is a Very Interesting Book}, (New York: Knopf, 2007), 52.
