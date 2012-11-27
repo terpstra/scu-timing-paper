@@ -80,7 +80,7 @@ to achieve the desired result at the correct time.
 Unfortunately, executing actions takes a variable amount of time.
 If the action takes 90-110$\mu$s to execute, 
 then this places two constraints on the system.
-First, the data master must issue commands at least 110$\mu$s ahead of time.
+Firstly, the data master must issue commands at least 110$\mu$s ahead of time.
 Secondly, the system must be able to tolerate that the action could be as
 much as 10$\mu$s too early or too late.
 
@@ -94,14 +94,14 @@ such as network propagation delay, which only exacerbate the problem.
 It is thus generally desirable to have fast action execution.
 
 Non-deterministic execution time is a potentially much more serious problem.
-For example, if a kicker action executes a few nanoseconds too late,
-the beam might be lost.
+For example, if a kicker executes an action a few nanoseconds too late,
+the beam might be lost~\cite{kicker}.
 However, not all actions require the same precision,
 and it may make sense to trade accuracy for flexibility in some situations.
 
 Fortunately, the  most common equipment controller in FAIR, 
 the Scalable Control Unit (SCU),
-has several possible methods for executing actions.
+has several possibilities for executing actions.
 This paper outlines the timing requirements of various accelerator
 components in FAIR and explorers the alternatives which could meet them.
 
@@ -167,7 +167,7 @@ increasing the runtime variability.
 
 % Atom: userspace
 \textbf{Atom-Userspace}
-Rather than running the execution software in kernel-space,
+Rather than executing the action's software in kernel-space,
 the SCU could also deliver the interrupt to user-space.
 This adds additional context switch overhead, 
 but provides for a more comfortable programming environment.
@@ -184,21 +184,49 @@ However, it arguably provides the most flexible action execution framework.
 
 \section{Analysis}
 % how measured
-% graph 1: PDF, free y-scale, 0-100us
-% table 2: average, stddev, worst-case spread
+To measure the delay and variability of the alternative execution paths,
+we connected two outputs from the SCU to an oscilloscope.
+The first output is the action aligned to the FPGA's 8ns clock.
+The second output is toggled by the execution path being measured.
+This approach excludes the variability of direct FPGA execution.
+However, this sub-nanosecond delay is dwarfed by the alternatives measured.
 
-% blah blah numbers are good
+To capture worst-case variability, 
+all test systems were subjected to a background work-load.
+All measurements include at least 10000 samples.
+For the LM32, 
+we ran a the white rabbit PTP core in the background,
+and performed a save/restore of all 32 registers on interrupt context switch.
+For the Atom,
+we ran a real-time patched 2.6.36 kernel.
+The processor had a constant background task streaming text over ssh.
+The PCIe bridge interrupt handler and kernel tasklet processes were set to
+real-time priority 99.
+For the userspace test, the test program had real-time priority 98.
+FESA set its own real-time priority to 60.
+
+\begin{figure}[t]
+   \centering
+   \begin{tabular}{l|c|c|c|c}
+     $\mu$s    & min   & mean  & max   & stddev \\
+     \hline
+     FPGA\footnote{Not measured directly.} & 0 & 0.001 & 0.001 & 0.001 \\
+     LM32      & 2.863 & 2.924 & 3.217 & 0.058  \\
+     Kernel    & 7.120 & 13.29 & 37.73 & 3.49   \\
+     Userspace & 49.36 & 62.49 & 93.33 & 5.62   \\
+     FESA      & 138.9 & 170.1 & 246.1 & 10.8 \\
+   \end{tabular}
+   \caption{Execution timing performance}
+\end{figure}
+
+
+\begin{figure}[t]
+   \centering
+   \includegraphics*[width=65mm]{pdf}
+   \caption{Comparison of delay distributions}
+\end{figure}
 
 \section{Conclusion}
-
-
-%\begin{figure}[htb]
-%   \centering
-%   \includegraphics*[width=65mm]{JACpic_mc.eps}
-%   \caption{Layout of papers.}
-%   \label{l2ea4-f1}
-%\end{figure}
-
 
 \begin{thebibliography}{9}   % Use for  1-9  references
 %\begin{thebibliography}{99} % Use for 10-99 references

@@ -1,8 +1,8 @@
-LECROYWR64MXi,50182,Histogram
-Segments,1,SegmentSize,500
-Segment,TrigTime,TimeSinceSegment1
+#LECROYWR64MXi,50182,Histogram
+#Segments,1,SegmentSize,500
+#Segment,TrigTime,TimeSinceSegment1
 #1,22-Nov-2012 14:16:28,0                 
-Time,Ampl
+#Time,Ampl
 0,0
 2e-007,0
 4e-007,0
