@@ -192,14 +192,14 @@ This approach excludes the variability of direct FPGA execution.
 However, this sub-nanosecond delay is dwarfed by the alternatives measured.
 
 To capture worst-case variability, 
-all test systems were subjected to a background work-load.
-All measurements include at least 10000 samples.
+all test systems were subjected to a background work-load
+and include at least 10000 samples.
 For the LM32, 
-we ran a the white rabbit PTP core in the background,
+we ran the white rabbit PTP core in the background,
 and performed a save/restore of all 32 registers on interrupt context switch.
-For the Atom,
-we ran a real-time patched 2.6.36 kernel.
-The processor had a constant background task streaming text over ssh.
+The Atom had a constant background task streaming text over ssh.
+
+We tested the Atom with a real-time patched 2.6.36 Linux kernel.
 The PCIe bridge interrupt handler and kernel tasklet processes were set to
 real-time priority 99.
 For the userspace test, the test program had real-time priority 98.
@@ -210,7 +210,7 @@ FESA set its own real-time priority to 60.
    \begin{tabular}{l|c|c|c|c}
      $\mu$s    & min   & mean  & max   & stddev \\
      \hline
-     FPGA\footnote{Not measured directly.} & 0 & 0.001 & 0.001 & 0.001 \\
+     FPGA      & 0 & 0.001 & 0.001 & 0.001 \\
      LM32      & 2.863 & 2.924 & 3.217 & 0.058  \\
      Kernel    & 7.120 & 13.29 & 37.73 & 3.49   \\
      Userspace & 49.36 & 62.49 & 93.33 & 5.62   \\
@@ -222,9 +222,32 @@ FESA set its own real-time priority to 60.
 
 \begin{figure}[t]
    \centering
-   \includegraphics*[width=65mm]{pdf}
+   \includegraphics*[width=\columnwidth]{pdf}
    \caption{Comparison of delay distributions}
 \end{figure}
+
+We also measured the LM32 without an instruction cache.
+This reduced the variability slightly from 354ns to 272ns, 
+but greatly increased the average delay from 2.924$\mu$s to 3.810$\mu$s.
+Most of the variability appears to stem from pending Wishbone bus operations which
+can take multiple cycles to complete.
+Our LM32 was clocked at 62.5MHz and when zoomed into the plot around 3$\mu$s,
+it becomes obvious that the distribution has 22 spikes with 16ns intervals.
+When the background task was removed, 
+this degenerates to 2 spikes, 
+completely removing the variability.
+The 3$\mu$s delay stems mostly from saving and restoring the register set.
+In principle, one could eliminate this cost using disjoint registers 
+in interrupt and non-interrupt contexts.
+
+From our measurements,
+both the time from interrupt to interrupt handler in Linux 
+and the time from interrupt handler to userspace completion vary significantly.
+Unfortunately, with only 10000 samples, 
+we could not trigger the worst case behaviour for both delays simultaneously.
+Adding the two worst-case delays measured separately,
+we predict that it should be possible for the Userspace delay to hit
+120$\mu$s and FESA 280$\mu$s.
 
 \section{Conclusion}
 
