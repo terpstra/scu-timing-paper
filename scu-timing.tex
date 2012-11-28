@@ -112,9 +112,9 @@ components in FAIR and explorers the alternatives which could meet them.
 % bunch-to-bunch
 The SCU will be the main frontend controller for the FAIR project.
 It provides a uniform platform connected both to the timing- and the data network of the facility. 
-In turn, the SCU controls Adaptive Control Units (ACU) slaves of various form factors which provide additional
+In turn, the SCU controls Adaptive Control Units (ACU) \cite{acuref} slaves of various form factors which provide additional
 features and the necessary hard- and software interfaces to control the actual accelerator components.
-This means a wide range of magnet power supplies, RF components and beam diagnosis equipment.
+This means a wide range of magnet power supplies, Radio Frequency (RF) components and beam diagnosis equipment.
 The set of executable actions of course varies depending on the connected equipment.
 A magnet power supply for example will be provided with parameters and timed instructions to source
 a current ramp to its magnet, an RF generator gets different sets of frequency and phase parameters and the time when it needs to switch between them. 
@@ -122,7 +122,7 @@ The basic concept of the SCU envisions a complete separation of data supply and 
 This way it can make use of higher abstraction levels ie complex software, which brings flexibility, is more comfortable and maintainable, and also use low level hardware implementations to provide fast, deterministic behavior for the precisely scheduled execution of commands.\\
 The device controlled in the RF use case is called FPGA Interface Board (FIB) \cite{fibref}.\\
 The kicker modules will be controlled by interface devices called IFK via a MIL-STD-1553
-based fieldbus system.
+based field bus system.
 
 
 \section{Scalable Control Unit (SCU)}
@@ -131,17 +131,17 @@ based fieldbus system.
 % what it does
 % what it contains
 % how it works
-The SCU is mechanicly a stack of up to three seperated boards. There is the FPGA base board
-with an Arria II FPGA, two SFP slots, DDR3 ram, parallel flash and a parallel bus (SCU bus) for
+The SCU is mechaniclly a stack of up to three separated boards. There is the FPGA base board
+with an Arria II FPGA, two Small Form-factor Pluggable (SFP) slots, DDR3 ram, parallel flash and a parallel bus (SCU bus) for
 controlling up to 12 slave devices. In addition the base boards is equipped with White rabbit circuitry.
 A ComExpress module with an Intel Atom CPU is mounted to
 the base board. It has ethernet, USB and PCIe interfaces. An optional extension board can
 be connected to the base board for backwards compatibility, that runs an MIL-STD-1553 based
 field bus interface.\\
-The SCU works as a frontend controller. On one side it is connected to the control system via ethernet,
+The SCU works as a front-end controller. On one side it is connected to the control system via ethernet,
 on the other side it controlls slave devices over the SCU bus. It receives timing information over
-a White Rabbit link, connected to an SFP. The White Rabbit receiver in the FPGA runs PTP in software
-on a LM32 softcore CPU. The control system speaks to the FESA class running
+a White Rabbit link, connected to an SFP. The White Rabbit receiver in the FPGA runs  Precision Time Protocol  (PTP) in software
+on a LatticeMico32 (LM32) soft-core CPU. The control system speaks to the Front End Software Architecture (FESA) class running
 on the Intel Atom which is connected to the FPGA via a PCIe bridge.
  
 \begin{figure}[t]
@@ -184,7 +184,7 @@ cache behaviour and on-chip bus accesses contribute to runtime variability.
 
 % Atom: kernel
 \textbf{Atom-Kernel}
-Venturing futher afield,
+Venturing further afield,
 the FPGA can issue an interrupt over PCIe to the Atom processor.
 The interrupt handler in the kernel driver then takes immediate action.
 This delays are the same as for the LM32, 
@@ -278,6 +278,10 @@ we predict that it should be possible for the Userspace delay to hit
 120$\mu$s and FESA 280$\mu$s.
 
 \section{Conclusion}
+%from Dietrich
+With respect for real-time capability,  the timing system for FAIR should meet the performance of the exiisting MIL-1588 based timing system, which are in the order of several microseconds. Unfortunately,
+this can not be achieved for code executed in userspace or FESA. Here, times measured not only have a constant offset but a jitter in the same order of magnitude. As a jitter cannot be corrected for in the data master, this requires that all actions requiring harder "real-time" to be executed in the LM32 or in HDL for hard real-time. However, this compromises the control system design that is based for soft-real time actions in FESA for the bulk part of the use cases.
+
 
 \begin{thebibliography}{9}   % Use for  1-9  references
 %\begin{thebibliography}{99} % Use for 10-99 references
