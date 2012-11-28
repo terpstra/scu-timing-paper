@@ -124,6 +124,26 @@ The kicker modules will be controlled by the old MIL-STD-1553 based fieldbus sys
 % what it does
 % what it contains
 % how it works
+The SCU is mechanicly a stack of up to three seperated boards. There is the FPGA base board
+with an Arria II FPGA, two SFP slots, DDR3 ram, parallel flash and a parallel bus (SCU bus) for
+controlling up to 12 slave devices. In addition the base boards is equipped with White rabbit circuitry.
+A ComExpress module with an Intel Atom CPU is mounted to
+the base board. It has ethernet, USB and PCIe interfaces. An optional extension board can
+be connected to the base board for backwards compatibility, that runs an MIL-STD-1553 based
+field bus interface.\\
+The SCU works as a frontend controller. On one side it is connected to the control system via ethernet,
+on the other side it controlls slave devices over the SCU bus. It receives timing information over
+a White Rabbit link, connected to an SFP. The White Rabbit receiver in the FPGA runs PTP in software
+on a LM32 softcore CPU. The control system speaks to the FESA class running
+on the Intel Atom which is connected to the FPGA via a PCIe bridge.
+ 
+
+
+\begin{figure}[t]
+   \centering
+   \includegraphics*[width=\columnwidth]{scu_schema}
+   \caption{Block diagram of SCU}
+\end{figure}
 
 
 \section{Execution Alternatives}
