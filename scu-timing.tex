@@ -41,7 +41,7 @@ GSI Helmholtzzentrum f¨ur Schwerionenforschung, D-64291 Darmstadt, Germany}
 The standard equipment controller under development for the new FAIR
 accelerator facility is the Scalable Control Unit (SCU). It is designed to
 synchronize and control the actions of up to 12 purpose-built slave cards,
-connected in a propritary crate by a parallel backplane. Inter-crate
+connected in a proprietary crate by a parallel backplane. Inter-crate
 coordination and facility-wide synchronization are a core FAIR requirement
 and thus precise timing of SCU slave actions is of vital importance.
 
@@ -110,12 +110,19 @@ components in FAIR and explorers the alternatives which could meet them.
 % kickers
 % ramps
 % bunch-to-bunch
-The SCU will be mainly used for power supplies for ramped magnets, for controlling
-RF devices and for controlling injection kickers.
-For controlling the power supplies another device called Adaptive Control
-Unit (ACU) \cite{acuref} is connected to the SCU. The device controlled in
-the RF use case is called FPGA Interface Board (FIB) \cite{fibref}.
-The kicker modules will be controlled by the old MIL-STD-1553 based fieldbus system.
+The SCU will be the main frontend controller for the FAIR project.
+It provides a uniform platform connected both to the timing- and the data network of the facility. 
+In turn, the SCU controls Adaptive Control Units (ACU) slaves of various form factors which provide additional
+features and the necessary hard- and software interfaces to control the actual accelerator components.
+This means a wide range of magnet power supplies, RF components and beam diagnosis equipment.
+The set of executable actions of course varies depending on the connected equipment.
+A magnet power supply for example will be provided with parameters and timed instructions to source
+a current ramp to its magnet, an RF generator gets different sets of frequency and phase parameters and the time when it needs to switch between them. 
+The basic concept of the SCU envisions a complete separation of data supply and timing/commands.
+This way it can make use of higher abstraction levels ie complex software, which brings flexibility, is more comfortable and maintainable, and also use low level hardware implementations to provide fast, deterministic behavior for the precisely scheduled execution of commands.\\
+The device controlled in the RF use case is called FPGA Interface Board (FIB) \cite{fibref}.\\
+The kicker modules will be controlled by interface devices called IFK via a MIL-STD-1553
+based fieldbus system.
 
 
 \section{Scalable Control Unit (SCU)}
@@ -137,8 +144,6 @@ a White Rabbit link, connected to an SFP. The White Rabbit receiver in the FPGA 
 on a LM32 softcore CPU. The control system speaks to the FESA class running
 on the Intel Atom which is connected to the FPGA via a PCIe bridge.
  
-
-
 \begin{figure}[t]
    \centering
    \includegraphics*[width=\columnwidth]{scu_schema}
@@ -277,9 +282,6 @@ we predict that it should be possible for the Userspace delay to hit
 \begin{thebibliography}{9}   % Use for  1-9  references
 %\begin{thebibliography}{99} % Use for 10-99 references
 
-\bibitem{accelconf-ref}
-C. Petit-Jean-Genaz and J. Poole, ``JACoW, A service to the Accelerator Community,''
-EPAC'04, Lucerne, July 2004, THZCH03,  p.~249, \texttt{http://www.JACoW.org}
 
 \bibitem{acuref}
 H. Ramakers  et al., ``Adaptive Control Unit for Digital Control of Power Converters for Magnets in GSI and FAIR Accelerators,'' GSI Scientific Report 2008, p. 117,
@@ -291,11 +293,11 @@ M. Kumm  et al., ``Realtime Communication Based on Optical Fibers for the Contro
 
 
 
-\bibitem{exampl-ref2}
-F.E.~Black et al., {\it This is a Very Interesting Book}, (New York: Knopf, 2007), 52.
+%\bibitem{exampl-ref2}
+%F.E.~Black et al., {\it This is a Very Interesting Book}, (New York: Knopf, 2007), 52.
 
-\bibitem{exampl-ref3}
-G.B.~Smith et al., ``Title of Paper,'' MOXAP07, these proceedings.
+%\bibitem{exampl-ref3}
+%G.B.~Smith et al., ``Title of Paper,'' MOXAP07, these proceedings.
 \end{thebibliography}
 
 \end{document}
